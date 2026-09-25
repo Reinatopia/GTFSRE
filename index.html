@@ -2,120 +2,512 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>World of Vira</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GTFS WL Spaceman</title>
+
 <style>
-*{box-sizing:border-box;user-select:none}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#111}
-#game{position:fixed;inset:0;overflow:hidden;background:linear-gradient(#75cfff 0 48%,#69b957 48% 100%)}
-#world{position:absolute;width:1800px;height:1000px}
-#ground{position:absolute;left:0;top:480px;width:1800px;height:520px;background:
-radial-gradient(circle at 20% 20%,#8ad06b 0 5px,transparent 6px),
-radial-gradient(circle at 70% 70%,#4e9c48 0 4px,transparent 5px),#65ad50}
-.road{position:absolute;background:#c9ad80;border:4px solid #b49369;border-radius:40px}
-.r1{left:0;top:690px;width:1800px;height:110px}
-.r2{left:845px;top:480px;width:110px;height:520px}
-.house{position:absolute;width:210px;height:145px;background:#f4d49f;border:6px solid #744b35;border-radius:5px}
-.house:before{content:"";position:absolute;left:-24px;top:-90px;width:245px;height:105px;background:#a9525a;border:6px solid #68343c;transform:skewX(-25deg)}
-.door{position:absolute;bottom:0;left:82px;width:46px;height:75px;background:#744b35}
-.tree{position:absolute;width:34px;height:110px;background:#70432c}
-.tree:before{content:"";position:absolute;left:-45px;top:-90px;width:125px;height:125px;border-radius:50%;background:#367f42;box-shadow:45px -20px 0 #438e4c,70px 20px 0 #2f713b}
-.character,.god{position:absolute;z-index:10;transform-origin:center bottom}
-.character img,.god img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 5px rgba(0,0,0,.25))}
-#player{width:95px;height:180px}
-.god{width:150px;height:230px}
-#destiny{left:775px;top:250px}
-#moon{left:470px;top:565px}
-#finality{left:1120px;top:535px}
-#death{left:805px;top:575px}
-#player{left:810px;top:650px}
-.name{position:absolute;top:-28px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:4px 9px;border-radius:10px;background:rgba(20,10,35,.72);color:#fff;font-weight:bold;font-size:13px}
-#ui{position:fixed;left:14px;top:14px;z-index:100;color:#fff;text-shadow:1px 2px 4px #000}
-#title{font-size:23px;font-weight:bold}
-#quest{margin-top:8px;background:rgba(0,0,0,.55);padding:10px 13px;border-radius:12px;font-size:14px}
-#dialog{display:none;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);width:min(92%,650px);z-index:200;background:rgba(18,12,30,.96);border:2px solid #d7b0ff;border-radius:16px;padding:18px;color:#fff}
-#speaker{color:#e0bfff;font-weight:bold;margin-bottom:7px}
-#dialogText{line-height:1.5}
-#close{margin-top:12px;border:0;border-radius:9px;padding:8px 15px;background:#8f5bd5;color:white}
-#hint{position:fixed;left:10px;bottom:10px;z-index:100;color:white;background:rgba(0,0,0,.55);padding:8px 11px;border-radius:9px;font-size:12px}
-#controls{position:fixed;right:12px;bottom:18px;z-index:100;display:grid;grid-template-columns:58px 58px 58px;grid-template-rows:58px 58px;gap:5px}
-.btn{border:2px solid rgba(255,255,255,.5);border-radius:15px;background:rgba(0,0,0,.5);color:#fff;font-size:24px}.up{grid-column:2}.left{grid-column:1}.down{grid-column:2}.right{grid-column:3}
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background:
+        radial-gradient(circle at 50% 20%, #16245c 0%, #080b20 45%, #03040d 100%);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.stars {
+    position: fixed;
+    inset: 0;
+    background-image:
+        radial-gradient(white 1px, transparent 1px),
+        radial-gradient(white 1px, transparent 1px);
+    background-size: 80px 80px, 130px 130px;
+    background-position: 10px 20px, 50px 70px;
+    opacity: .35;
+    pointer-events: none;
+}
+
+.game {
+    width: 95%;
+    max-width: 480px;
+    position: relative;
+    z-index: 2;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.balance {
+    background: rgba(255,255,255,.08);
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.arena {
+    height: 400px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 22px;
+    background:
+        linear-gradient(180deg, rgba(25,36,90,.5), rgba(2,5,18,.8));
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.multiplier {
+    position: absolute;
+    top: 35%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 58px;
+    font-weight: 900;
+    text-shadow: 0 0 25px #6f8cff;
+}
+
+.status {
+    position: absolute;
+    top: 51%;
+    width: 100%;
+    text-align: center;
+    color: #aab4e8;
+}
+
+.rocket {
+    position: absolute;
+    font-size: 55px;
+    left: 50%;
+    bottom: 35px;
+    transform: translateX(-50%) rotate(-25deg);
+    filter: drop-shadow(0 0 15px #ffb347);
+    transition: left .15s linear, bottom .15s linear;
+}
+
+.flame {
+    position: absolute;
+    font-size: 35px;
+    left: 50%;
+    bottom: 5px;
+    transform: translateX(-50%);
+    opacity: .8;
+}
+
+.controls {
+    margin-top: 14px;
+    padding: 15px;
+    background: rgba(255,255,255,.06);
+    border-radius: 18px;
+}
+
+.bet-row {
+    display: flex;
+    gap: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border: 0;
+    outline: none;
+    border-radius: 12px;
+    background: #11162f;
+    color: white;
+    font-size: 16px;
+}
+
+button {
+    border: 0;
+    border-radius: 12px;
+    padding: 14px;
+    font-weight: 900;
+    cursor: pointer;
+    color: white;
+}
+
+.bet {
+    width: 100%;
+    margin-top: 10px;
+    background: linear-gradient(135deg,#5865f2,#7d5cff);
+}
+
+.cashout {
+    width: 100%;
+    margin-top: 10px;
+    background: linear-gradient(135deg,#00a86b,#20d88b);
+    display: none;
+}
+
+button:disabled {
+    opacity: .4;
+}
+
+.quick {
+    display: flex;
+    gap: 7px;
+    margin-top: 9px;
+}
+
+.quick button {
+    flex: 1;
+    background: #171d3b;
+    font-size: 12px;
+}
+
+.history {
+    margin-top: 14px;
+    background: rgba(255,255,255,.05);
+    padding: 12px;
+    border-radius: 15px;
+}
+
+.history-title {
+    color: #8993c4;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.history-list {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+}
+
+.history-item {
+    background: #171d3b;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.green {
+    color: #39e58c;
+}
+
+.red {
+    color: #ff5964;
+}
+
+.footer {
+    text-align: center;
+    color: #68709a;
+    font-size: 11px;
+    margin-top: 12px;
+}
+
+.crash {
+    animation: shake .35s infinite;
+}
+
+@keyframes shake {
+    0% { transform: translateX(-50%) rotate(-25deg); }
+    25% { transform: translateX(-55%) rotate(-22deg); }
+    50% { transform: translateX(-45%) rotate(-28deg); }
+    75% { transform: translateX(-55%) rotate(-25deg); }
+    100% { transform: translateX(-50%) rotate(-25deg); }
+}
 </style>
 </head>
+
 <body>
-<div id="game">
-<div id="world">
-<div id="ground"></div><div class="road r1"></div><div class="road r2"></div>
-<div class="house" style="left:160px;top:390px"><div class="door"></div></div>
-<div class="house" style="left:1420px;top:390px"><div class="door"></div></div>
-<div class="tree" style="left:90px;top:480px"></div><div class="tree" style="left:360px;top:445px"></div>
-<div class="tree" style="left:1260px;top:450px"></div><div class="tree" style="left:1660px;top:465px"></div>
 
-<div id="destiny" class="god"><div class="name">Goddess Destiny</div><img src="assets/destiny.png"></div>
-<div id="moon" class="god"><div class="name">Goddess Moon</div><img src="assets/moon.png"></div>
-<div id="finality" class="god"><div class="name">Goddess Finality</div><img src="assets/finality.png"></div>
-<div id="death" class="god"><div class="name">Goddess Death</div><img src="assets/death.png"></div>
+<div class="stars"></div>
 
-<div id="player" class="character"><div class="name">Vira</div><img src="assets/vira.png"></div>
-</div>
+<div class="game">
 
-<div id="ui"><div id="title">🌌 WORLD OF VIRA</div><div id="quest">Quest: Temui para Dewi</div></div>
-<div id="dialog"><div id="speaker"></div><div id="dialogText"></div><button id="close">Tutup</button></div>
-<div id="hint">WASD / tombol panah = bergerak • Dekati dewi untuk bicara</div>
-<div id="controls">
-<button class="btn up" data-key="ArrowUp">▲</button>
-<button class="btn left" data-key="ArrowLeft">◀</button>
-<button class="btn down" data-key="ArrowDown">▼</button>
-<button class="btn right" data-key="ArrowRight">▶</button>
-</div>
+    <div class="header">
+        <div class="logo">🚀 GTFS SPACEMAN</div>
+        <div class="balance">
+            💎 <span id="balance">1000</span> WL
+        </div>
+    </div>
+
+    <div class="arena">
+
+        <div class="multiplier" id="multiplier">
+            1.00x
+        </div>
+
+        <div class="status" id="status">
+            Place your bet!
+        </div>
+
+        <div class="rocket" id="rocket">
+            🚀
+        </div>
+
+        <div class="flame">
+            🔥
+        </div>
+
+    </div>
+
+    <div class="controls">
+
+        <div class="bet-row">
+            <input
+                id="betAmount"
+                type="number"
+                min="1"
+                value="10"
+                placeholder="Jumlah WL">
+        </div>
+
+        <div class="quick">
+            <button onclick="setBet(5)">5 WL</button>
+            <button onclick="setBet(10)">10 WL</button>
+            <button onclick="setBet(50)">50 WL</button>
+            <button onclick="setBet(100)">100 WL</button>
+        </div>
+
+        <button class="bet" id="betButton" onclick="startGame()">
+            🚀 START BET
+        </button>
+
+        <button class="cashout" id="cashoutButton" onclick="cashOut()">
+            💰 CASH OUT
+        </button>
+
+    </div>
+
+    <div class="history">
+
+        <div class="history-title">
+            LAST MULTIPLIERS
+        </div>
+
+        <div class="history-list" id="historyList">
+            <div class="history-item green">2.45x</div>
+            <div class="history-item red">1.12x</div>
+            <div class="history-item green">5.73x</div>
+            <div class="history-item green">3.21x</div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        GTFS Fun Game • Virtual WL only
+    </div>
+
 </div>
 
 <script>
-const player=document.getElementById("player"),world=document.getElementById("world");
-const dialog=document.getElementById("dialog"),speaker=document.getElementById("speaker"),dialogText=document.getElementById("dialogText"),quest=document.getElementById("quest");
-let x=810,y=650,speed=5; const keys={};
 
-addEventListener("keydown",e=>keys[e.key]=true);
-addEventListener("keyup",e=>keys[e.key]=false);
-document.querySelectorAll(".btn").forEach(b=>{
- const k=b.dataset.key;
- ["touchstart","mousedown"].forEach(ev=>b.addEventListener(ev,e=>{e.preventDefault();keys[k]=true}));
- ["touchend","mouseup","mouseleave"].forEach(ev=>b.addEventListener(ev,e=>{e.preventDefault();keys[k]=false}));
-});
-document.getElementById("close").onclick=()=>dialog.style.display="none";
+let balance = 1000;
+let multiplier = 1;
+let crashPoint = 0;
+let bet = 0;
+let running = false;
+let gameTimer = null;
 
-const gods=[
- {name:"Goddess Destiny",x:850,y:350,text:"Vira... takdir dunia ini mulai bergerak. Bahkan masa depan para dewa tidak lagi pasti."},
- {name:"Goddess Moon",x:545,y:650,text:"Aku menjaga cahaya malam. Tetapi akhir-akhir ini, ada sesuatu yang bersembunyi di balik bulan."},
- {name:"Goddess Finality",x:1190,y:620,text:"Segala sesuatu memiliki akhir. Namun dunia yang kau ciptakan belum menemukan akhirnya."},
- {name:"Goddess Death",x:850,y:650,text:"Jangan takut pada kematian. Yang harus kau takuti adalah sesuatu yang bahkan kematian tidak mampu mengambilnya."}
-];
+const balanceEl = document.getElementById("balance");
+const multiplierEl = document.getElementById("multiplier");
+const statusEl = document.getElementById("status");
+const rocketEl = document.getElementById("rocket");
+const betButton = document.getElementById("betButton");
+const cashoutButton = document.getElementById("cashoutButton");
+const betInput = document.getElementById("betAmount");
+const historyList = document.getElementById("historyList");
 
-let met=new Set();
-function dist(a,b,c,d){return Math.hypot(a-c,b-d)}
-function talk(){
- let near=null,md=999;
- gods.forEach(g=>{let d=dist(x,y,g.x,g.y);if(d<md){md=d;near=g}});
- if(near&&md<125){
-   speaker.textContent=near.name;dialogText.textContent=near.text;dialog.style.display="block";
-   met.add(near.name); quest.textContent=`Quest: ${met.size}/4 dewi telah ditemui`;
-   if(met.size===4)quest.textContent="Quest selesai ✓ Semua dewi telah ditemui!";
- }
+function updateBalance() {
+    balanceEl.textContent = balance.toLocaleString("id-ID");
 }
-function loop(){
- if(keys.ArrowUp||keys.w||keys.W)y-=speed;
- if(keys.ArrowDown||keys.s||keys.S)y+=speed;
- if(keys.ArrowLeft||keys.a||keys.A)x-=speed;
- if(keys.ArrowRight||keys.d||keys.D)x+=speed;
- x=Math.max(20,Math.min(1720,x));y=Math.max(470,Math.min(820,y));
- player.style.left=x+"px";player.style.top=y+"px";
- const sw=innerWidth,sh=innerHeight;
- let cx=sw/2-x-47,cy=sh/2-y-90;
- cx=Math.min(0,Math.max(sw-1800,cx));cy=Math.min(0,Math.max(sh-1000,cy));
- world.style.transform=`translate(${cx}px,${cy}px)`;
- talk();requestAnimationFrame(loop);
+
+function setBet(amount) {
+    betInput.value = amount;
 }
-loop();
+
+function randomCrash() {
+
+    // Membuat crash point dengan mayoritas hasil
+    // berada di multiplier rendah.
+    let r = Math.random();
+
+    if (r < 0.45) {
+        return 1 + Math.random() * 0.8;
+    }
+
+    if (r < 0.75) {
+        return 1.8 + Math.random() * 1.7;
+    }
+
+    if (r < 0.93) {
+        return 3.5 + Math.random() * 4;
+    }
+
+    return 7 + Math.random() * 15;
+}
+
+function startGame() {
+
+    if (running) return;
+
+    bet = Number(betInput.value);
+
+    if (!bet || bet <= 0) {
+        alert("Masukkan jumlah WL!");
+        return;
+    }
+
+    if (bet > balance) {
+        alert("WL kamu tidak cukup!");
+        return;
+    }
+
+    balance -= bet;
+    updateBalance();
+
+    multiplier = 1;
+    crashPoint = randomCrash();
+    running = true;
+
+    multiplierEl.textContent = "1.00x";
+    statusEl.textContent = "🚀 Rocket is flying...";
+    
+    betButton.style.display = "none";
+    cashoutButton.style.display = "block";
+
+    rocketEl.classList.remove("crash");
+
+    let startTime = Date.now();
+
+    gameTimer = setInterval(() => {
+
+        let elapsed = (Date.now() - startTime) / 1000;
+
+        multiplier = 1 + elapsed * 0.55 + Math.pow(elapsed, 1.35) * 0.12;
+
+        multiplierEl.textContent =
+            multiplier.toFixed(2) + "x";
+
+        // Gerakan roket
+        let height = Math.min(elapsed * 30, 280);
+        let side = Math.sin(elapsed * 2) * 80;
+
+        rocketEl.style.bottom = (35 + height) + "px";
+        rocketEl.style.left =
+            `calc(50% + ${side}px)`;
+
+        if (multiplier >= crashPoint) {
+            crash();
+        }
+
+    }, 50);
+}
+
+function cashOut() {
+
+    if (!running) return;
+
+    let win = Math.floor(bet * multiplier);
+
+    balance += win;
+    updateBalance();
+
+    addHistory(multiplier, true);
+
+    clearInterval(gameTimer);
+
+    running = false;
+
+    statusEl.textContent =
+        "💰 CASH OUT +" + win + " WL";
+
+    multiplierEl.classList.add("green");
+
+    betButton.style.display = "block";
+    cashoutButton.style.display = "none";
+
+    setTimeout(() => {
+        multiplierEl.classList.remove("green");
+        resetRocket();
+    }, 1200);
+}
+
+function crash() {
+
+    clearInterval(gameTimer);
+
+    running = false;
+
+    multiplierEl.textContent =
+        crashPoint.toFixed(2) + "x";
+
+    multiplierEl.classList.remove("green");
+    multiplierEl.classList.add("red");
+
+    statusEl.textContent = "💥 CRASHED!";
+
+    rocketEl.classList.add("crash");
+
+    addHistory(crashPoint, false);
+
+    betButton.style.display = "block";
+    cashoutButton.style.display = "none";
+
+    setTimeout(() => {
+
+        multiplierEl.classList.remove("red");
+
+        resetRocket();
+
+    }, 1300);
+}
+
+function resetRocket() {
+
+    rocketEl.classList.remove("crash");
+
+    rocketEl.style.bottom = "35px";
+    rocketEl.style.left = "50%";
+
+    multiplier = 1;
+
+    multiplierEl.textContent = "1.00x";
+
+    statusEl.textContent = "Place your bet!";
+}
+
+function addHistory(value, won) {
+
+    const item = document.createElement("div");
+
+    item.className =
+        "history-item " + (won ? "green" : "red");
+
+    item.textContent =
+        value.toFixed(2) + "x";
+
+    historyList.prepend(item);
+
+    while (historyList.children.length > 8) {
+        historyList.removeChild(historyList.lastChild);
+    }
+}
+
+updateBalance();
+
 </script>
+
 </body>
-</html>
+ </html>

@@ -2,512 +2,1082 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>GTFS WL Spaceman</title>
+<title>GTFS Exchange</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    user-select: none;
+*{
+    box-sizing:border-box;
 }
 
-body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: Arial, sans-serif;
-    background:
-        radial-gradient(circle at 50% 20%, #16245c 0%, #080b20 45%, #03040d 100%);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+body{
+    margin:0;
+    background:#080b12;
+    color:#e8edf7;
+    font-family:Arial,Helvetica,sans-serif;
 }
 
-.stars {
-    position: fixed;
-    inset: 0;
-    background-image:
-        radial-gradient(white 1px, transparent 1px),
-        radial-gradient(white 1px, transparent 1px);
-    background-size: 80px 80px, 130px 130px;
-    background-position: 10px 20px, 50px 70px;
-    opacity: .35;
-    pointer-events: none;
+.header{
+    height:64px;
+    background:#0d111a;
+    border-bottom:1px solid #202634;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 20px;
 }
 
-.game {
-    width: 95%;
-    max-width: 480px;
-    position: relative;
-    z-index: 2;
+.logo{
+    font-size:20px;
+    font-weight:bold;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
+.logo span{
+    color:#35d39a;
 }
 
-.logo {
-    font-size: 22px;
-    font-weight: 900;
+.market-name{
+    color:#8993a7;
+    font-size:13px;
 }
 
-.balance {
-    background: rgba(255,255,255,.08);
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-weight: bold;
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:15px;
 }
 
-.arena {
-    height: 400px;
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 22px;
-    background:
-        linear-gradient(180deg, rgba(25,36,90,.5), rgba(2,5,18,.8));
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+.top{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:12px;
 }
 
-.multiplier {
-    position: absolute;
-    top: 35%;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 58px;
-    font-weight: 900;
-    text-shadow: 0 0 25px #6f8cff;
+.card{
+    background:#0d111a;
+    border:1px solid #202634;
+    border-radius:10px;
+    padding:14px;
 }
 
-.status {
-    position: absolute;
-    top: 51%;
-    width: 100%;
-    text-align: center;
-    color: #aab4e8;
+.price{
+    font-size:30px;
+    font-weight:bold;
 }
 
-.rocket {
-    position: absolute;
-    font-size: 55px;
-    left: 50%;
-    bottom: 35px;
-    transform: translateX(-50%) rotate(-25deg);
-    filter: drop-shadow(0 0 15px #ffb347);
-    transition: left .15s linear, bottom .15s linear;
+.green{
+    color:#27d69a;
 }
 
-.flame {
-    position: absolute;
-    font-size: 35px;
-    left: 50%;
-    bottom: 5px;
-    transform: translateX(-50%);
-    opacity: .8;
+.red{
+    color:#ff5263;
 }
 
-.controls {
-    margin-top: 14px;
-    padding: 15px;
-    background: rgba(255,255,255,.06);
-    border-radius: 18px;
+.stats{
+    display:flex;
+    gap:20px;
+    margin-top:8px;
+    font-size:12px;
+    color:#8993a7;
 }
 
-.bet-row {
-    display: flex;
-    gap: 10px;
+.chart-card{
+    background:#0d111a;
+    border:1px solid #202634;
+    border-radius:10px;
+    overflow:hidden;
 }
 
-input {
-    width: 100%;
-    padding: 14px;
-    border: 0;
-    outline: none;
-    border-radius: 12px;
-    background: #11162f;
-    color: white;
-    font-size: 16px;
+.chart-head{
+    padding:12px;
+    border-bottom:1px solid #202634;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-button {
-    border: 0;
-    border-radius: 12px;
-    padding: 14px;
-    font-weight: 900;
-    cursor: pointer;
-    color: white;
+.tabs button{
+    background:none;
+    color:#8993a7;
+    border:0;
+    padding:6px 10px;
+    cursor:pointer;
 }
 
-.bet {
-    width: 100%;
-    margin-top: 10px;
-    background: linear-gradient(135deg,#5865f2,#7d5cff);
+.tabs button.active{
+    color:white;
+    background:#202634;
+    border-radius:5px;
 }
 
-.cashout {
-    width: 100%;
-    margin-top: 10px;
-    background: linear-gradient(135deg,#00a86b,#20d88b);
-    display: none;
+canvas{
+    width:100%;
+    height:430px;
+    display:block;
 }
 
-button:disabled {
-    opacity: .4;
+.bottom{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:12px;
 }
 
-.quick {
-    display: flex;
-    gap: 7px;
-    margin-top: 9px;
+.balance-row{
+    display:flex;
+    justify-content:space-between;
+    margin:8px 0;
+    color:#9da6b8;
 }
 
-.quick button {
-    flex: 1;
-    background: #171d3b;
-    font-size: 12px;
+.balance-row strong{
+    color:white;
 }
 
-.history {
-    margin-top: 14px;
-    background: rgba(255,255,255,.05);
-    padding: 12px;
-    border-radius: 15px;
+.order-title{
+    font-size:16px;
+    font-weight:bold;
+    margin-bottom:12px;
 }
 
-.history-title {
-    color: #8993c4;
-    font-size: 12px;
-    margin-bottom: 8px;
+input{
+    width:100%;
+    padding:12px;
+    background:#080b12;
+    color:white;
+    border:1px solid #2a3242;
+    border-radius:6px;
+    outline:none;
+    margin-bottom:10px;
 }
 
-.history-list {
-    display: flex;
-    gap: 7px;
-    overflow-x: auto;
+.buttons{
+    display:flex;
+    gap:8px;
 }
 
-.history-item {
-    background: #171d3b;
-    padding: 7px 10px;
-    border-radius: 8px;
-    font-size: 13px;
-    white-space: nowrap;
+button.order{
+    flex:1;
+    border:0;
+    padding:12px;
+    border-radius:6px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-.green {
-    color: #39e58c;
+.buy{
+    background:#18b982;
+    color:white;
 }
 
-.red {
-    color: #ff5964;
+.sell{
+    background:#e94d60;
+    color:white;
 }
 
-.footer {
-    text-align: center;
-    color: #68709a;
-    font-size: 11px;
-    margin-top: 12px;
+.orders{
+    margin-top:12px;
 }
 
-.crash {
-    animation: shake .35s infinite;
+.trade{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid #202634;
+    font-size:13px;
 }
 
-@keyframes shake {
-    0% { transform: translateX(-50%) rotate(-25deg); }
-    25% { transform: translateX(-55%) rotate(-22deg); }
-    50% { transform: translateX(-45%) rotate(-28deg); }
-    75% { transform: translateX(-55%) rotate(-25deg); }
-    100% { transform: translateX(-50%) rotate(-25deg); }
+.footer{
+    text-align:center;
+    color:#566074;
+    font-size:11px;
+    padding:20px;
+}
+
+@media(max-width:700px){
+
+    .top,
+    .bottom{
+        grid-template-columns:1fr;
+    }
+
+    canvas{
+        height:330px;
+    }
+
+    .price{
+        font-size:25px;
+    }
+
+    .stats{
+        gap:10px;
+        flex-wrap:wrap;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div class="stars"></div>
+<header class="header">
 
-<div class="game">
-
-    <div class="header">
-        <div class="logo">🚀 GTFS SPACEMAN</div>
-        <div class="balance">
-            💎 <span id="balance">1000</span> WL
-        </div>
+    <div class="logo">
+        💎 <span>GTFS</span> EXCHANGE
     </div>
 
-    <div class="arena">
+    <div class="market-name">
+        DL/IDR
+    </div>
 
-        <div class="multiplier" id="multiplier">
-            1.00x
+</header>
+
+
+<div class="container">
+
+    <!-- PRICE -->
+
+    <div class="top">
+
+        <div class="card">
+
+            <div style="font-size:12px;color:#8993a7">
+                DIAMOND LOCK / IDR
+            </div>
+
+            <div class="price" id="price">
+                Rp50.000
+            </div>
+
+            <div id="change" class="green">
+                +0.00%
+            </div>
+
+            <div class="stats">
+
+                <div>
+                    HIGH
+                    <strong id="high">Rp50.000</strong>
+                </div>
+
+                <div>
+                    LOW
+                    <strong id="low">Rp50.000</strong>
+                </div>
+
+                <div>
+                    VOLUME
+                    <strong id="volume">0 DL</strong>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="status" id="status">
-            Place your bet!
-        </div>
 
-        <div class="rocket" id="rocket">
-            🚀
-        </div>
+        <div class="card">
 
-        <div class="flame">
-            🔥
+            <div style="font-size:12px;color:#8993a7">
+                MARKET STATUS
+            </div>
+
+            <div style="font-size:22px;margin-top:7px;color:#27d69a">
+                ● OPEN
+            </div>
+
+            <div style="font-size:12px;color:#8993a7;margin-top:7px">
+                Virtual GTFS Market
+            </div>
+
         </div>
 
     </div>
 
-    <div class="controls">
 
-        <div class="bet-row">
+    <!-- CHART -->
+
+    <div class="chart-card">
+
+        <div class="chart-head">
+
+            <strong>DL / IDR</strong>
+
+            <div class="tabs">
+
+                <button class="active" onclick="setTimeframe(1,this)">
+                    1m
+                </button>
+
+                <button onclick="setTimeframe(5,this)">
+                    5m
+                </button>
+
+                <button onclick="setTimeframe(15,this)">
+                    15m
+                </button>
+
+            </div>
+
+        </div>
+
+        <canvas id="chart"></canvas>
+
+    </div>
+
+
+    <!-- BOTTOM -->
+
+    <div class="bottom">
+
+        <!-- BALANCE -->
+
+        <div class="card">
+
+            <div class="order-title">
+                WALLET
+            </div>
+
+            <div class="balance-row">
+                <span>💎 Diamond Lock</span>
+                <strong id="dlBalance">100 DL</strong>
+            </div>
+
+            <div class="balance-row">
+                <span>🇮🇩 IDR</span>
+                <strong id="idrBalance">Rp5.000.000</strong>
+            </div>
+
+        </div>
+
+
+        <!-- ORDER -->
+
+        <div class="card">
+
+            <div class="order-title">
+                MARKET ORDER
+            </div>
+
             <input
-                id="betAmount"
+                id="amount"
                 type="number"
                 min="1"
-                value="10"
-                placeholder="Jumlah WL">
-        </div>
+                value="1"
+                placeholder="Jumlah DL">
 
-        <div class="quick">
-            <button onclick="setBet(5)">5 WL</button>
-            <button onclick="setBet(10)">10 WL</button>
-            <button onclick="setBet(50)">50 WL</button>
-            <button onclick="setBet(100)">100 WL</button>
-        </div>
+            <div class="buttons">
 
-        <button class="bet" id="betButton" onclick="startGame()">
-            🚀 START BET
-        </button>
+                <button
+                    class="order buy"
+                    onclick="buyDL()">
+                    BUY
+                </button>
 
-        <button class="cashout" id="cashoutButton" onclick="cashOut()">
-            💰 CASH OUT
-        </button>
+                <button
+                    class="order sell"
+                    onclick="sellDL()">
+                    SELL
+                </button>
 
-    </div>
+            </div>
 
-    <div class="history">
-
-        <div class="history-title">
-            LAST MULTIPLIERS
-        </div>
-
-        <div class="history-list" id="historyList">
-            <div class="history-item green">2.45x</div>
-            <div class="history-item red">1.12x</div>
-            <div class="history-item green">5.73x</div>
-            <div class="history-item green">3.21x</div>
         </div>
 
     </div>
 
-    <div class="footer">
-        GTFS Fun Game • Virtual WL only
+
+    <!-- HISTORY -->
+
+    <div class="card orders">
+
+        <div class="order-title">
+            RECENT TRADES
+        </div>
+
+        <div id="trades">
+
+            <div class="trade">
+                <span>BUY</span>
+                <span>1 DL</span>
+                <span>Rp50.000</span>
+            </div>
+
+        </div>
+
     </div>
 
 </div>
 
+
+<div class="footer">
+    GTFS Exchange • Virtual Market • For Fun
+</div>
+
+
 <script>
 
-let balance = 1000;
-let multiplier = 1;
-let crashPoint = 0;
-let bet = 0;
-let running = false;
-let gameTimer = null;
+const canvas = document.getElementById("chart");
+const ctx = canvas.getContext("2d");
 
-const balanceEl = document.getElementById("balance");
-const multiplierEl = document.getElementById("multiplier");
-const statusEl = document.getElementById("status");
-const rocketEl = document.getElementById("rocket");
-const betButton = document.getElementById("betButton");
-const cashoutButton = document.getElementById("cashoutButton");
-const betInput = document.getElementById("betAmount");
-const historyList = document.getElementById("historyList");
+let price = 50000;
 
-function updateBalance() {
-    balanceEl.textContent = balance.toLocaleString("id-ID");
+let openingPrice = 50000;
+
+let high = price;
+
+let low = price;
+
+let volume = 0;
+
+let dlBalance = 100;
+
+let idrBalance = 5000000;
+
+let timeframe = 1;
+
+let candles = [];
+
+let currentCandle = null;
+
+
+/* =========================
+   FORMAT
+========================= */
+
+function rupiah(value){
+
+    return "Rp" + Math.round(value)
+        .toLocaleString("id-ID");
+
 }
 
-function setBet(amount) {
-    betInput.value = amount;
+
+/* =========================
+   CREATE CANDLE
+========================= */
+
+function newCandle(){
+
+    currentCandle = {
+
+        open: price,
+
+        high: price,
+
+        low: price,
+
+        close: price,
+
+        volume: Math.floor(
+            Math.random()*50
+        )
+
+    };
+
+    candles.push(currentCandle);
+
+    if(candles.length > 50){
+
+        candles.shift();
+
+    }
+
 }
 
-function randomCrash() {
 
-    // Membuat crash point dengan mayoritas hasil
-    // berada di multiplier rendah.
-    let r = Math.random();
+/* =========================
+   PRICE ENGINE
+========================= */
 
-    if (r < 0.45) {
-        return 1 + Math.random() * 0.8;
+function updateMarket(){
+
+    /*
+       Simulasi market.
+
+       Random kecil + momentum
+       membuat pergerakan terlihat
+       lebih natural.
+    */
+
+    let movement =
+        (Math.random()-0.48)
+        * price
+        * 0.0025;
+
+
+    price += movement;
+
+
+    if(price < 1000){
+
+        price = 1000;
+
     }
 
-    if (r < 0.75) {
-        return 1.8 + Math.random() * 1.7;
-    }
 
-    if (r < 0.93) {
-        return 3.5 + Math.random() * 4;
-    }
+    currentCandle.close = price;
 
-    return 7 + Math.random() * 15;
+    currentCandle.high =
+        Math.max(
+            currentCandle.high,
+            price
+        );
+
+    currentCandle.low =
+        Math.min(
+            currentCandle.low,
+            price
+        );
+
+
+    high = Math.max(high,price);
+
+    low = Math.min(low,price);
+
+    volume +=
+        Math.floor(Math.random()*10);
+
+
+    updateUI();
+
+    drawChart();
+
 }
 
-function startGame() {
 
-    if (running) return;
+/* =========================
+   UI
+========================= */
 
-    bet = Number(betInput.value);
+function updateUI(){
 
-    if (!bet || bet <= 0) {
-        alert("Masukkan jumlah WL!");
+    document.getElementById("price")
+        .textContent = rupiah(price);
+
+
+    let change =
+        ((price-openingPrice)
+        /openingPrice)*100;
+
+
+    const changeEl =
+        document.getElementById("change");
+
+
+    changeEl.textContent =
+        (change >= 0 ? "+" : "")
+        + change.toFixed(2)
+        + "%";
+
+
+    changeEl.className =
+        change >= 0
+        ? "green"
+        : "red";
+
+
+    document.getElementById("high")
+        .textContent = rupiah(high);
+
+
+    document.getElementById("low")
+        .textContent = rupiah(low);
+
+
+    document.getElementById("volume")
+        .textContent =
+        volume.toLocaleString("id-ID")
+        + " DL";
+
+
+    document.getElementById("dlBalance")
+        .textContent =
+        dlBalance.toFixed(2)
+        + " DL";
+
+
+    document.getElementById("idrBalance")
+        .textContent =
+        rupiah(idrBalance);
+
+}
+
+
+/* =========================
+   CHART
+========================= */
+
+function resizeCanvas(){
+
+    canvas.width =
+        canvas.clientWidth *
+        window.devicePixelRatio;
+
+    canvas.height =
+        canvas.clientHeight *
+        window.devicePixelRatio;
+
+    ctx.scale(
+        window.devicePixelRatio,
+        window.devicePixelRatio
+    );
+
+    drawChart();
+
+}
+
+
+function drawChart(){
+
+    const width =
+        canvas.clientWidth;
+
+    const height =
+        canvas.clientHeight;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    if(candles.length === 0)
         return;
+
+
+    let min =
+        Math.min(
+            ...candles.map(c=>c.low)
+        );
+
+    let max =
+        Math.max(
+            ...candles.map(c=>c.high)
+        );
+
+
+    let range = max-min;
+
+    if(range === 0)
+        range = 1;
+
+
+    /*
+       Grid
+    */
+
+    ctx.strokeStyle =
+        "#171d28";
+
+    ctx.lineWidth = 1;
+
+
+    for(let i=0;i<6;i++){
+
+        let y =
+            (height/5)*i;
+
+        ctx.beginPath();
+
+        ctx.moveTo(0,y);
+
+        ctx.lineTo(width,y);
+
+        ctx.stroke();
+
     }
 
-    if (bet > balance) {
-        alert("WL kamu tidak cukup!");
-        return;
-    }
 
-    balance -= bet;
-    updateBalance();
+    let candleWidth =
+        Math.max(
+            5,
+            width/candles.length*0.65
+        );
 
-    multiplier = 1;
-    crashPoint = randomCrash();
-    running = true;
 
-    multiplierEl.textContent = "1.00x";
-    statusEl.textContent = "🚀 Rocket is flying...";
-    
-    betButton.style.display = "none";
-    cashoutButton.style.display = "block";
+    candles.forEach((c,i)=>{
 
-    rocketEl.classList.remove("crash");
+        let x =
+            i *
+            (width/candles.length)
+            +
+            (width/candles.length)/2;
 
-    let startTime = Date.now();
 
-    gameTimer = setInterval(() => {
+        function y(value){
 
-        let elapsed = (Date.now() - startTime) / 1000;
+            return height -
+                ((value-min)/range)
+                *height*0.88
+                -20;
 
-        multiplier = 1 + elapsed * 0.55 + Math.pow(elapsed, 1.35) * 0.12;
-
-        multiplierEl.textContent =
-            multiplier.toFixed(2) + "x";
-
-        // Gerakan roket
-        let height = Math.min(elapsed * 30, 280);
-        let side = Math.sin(elapsed * 2) * 80;
-
-        rocketEl.style.bottom = (35 + height) + "px";
-        rocketEl.style.left =
-            `calc(50% + ${side}px)`;
-
-        if (multiplier >= crashPoint) {
-            crash();
         }
 
-    }, 50);
+
+        let openY =
+            y(c.open);
+
+        let closeY =
+            y(c.close);
+
+        let highY =
+            y(c.high);
+
+        let lowY =
+            y(c.low);
+
+
+        let bullish =
+            c.close >= c.open;
+
+
+        ctx.strokeStyle =
+            bullish
+            ? "#27d69a"
+            : "#ff5263";
+
+
+        ctx.fillStyle =
+            bullish
+            ? "#27d69a"
+            : "#ff5263";
+
+
+        /*
+           Wick
+        */
+
+        ctx.beginPath();
+
+        ctx.moveTo(x,highY);
+
+        ctx.lineTo(x,lowY);
+
+        ctx.stroke();
+
+
+        /*
+           Body
+        */
+
+        let bodyTop =
+            Math.min(
+                openY,
+                closeY
+            );
+
+        let bodyHeight =
+            Math.max(
+                2,
+                Math.abs(
+                    closeY-openY
+                )
+            );
+
+
+        ctx.fillRect(
+            x-candleWidth/2,
+            bodyTop,
+            candleWidth,
+            bodyHeight
+        );
+
+    });
+
+
+    /*
+       Current price line
+    */
+
+    let lastY =
+        height -
+        ((price-min)/range)
+        *height*0.88
+        -20;
+
+
+    ctx.setLineDash([5,5]);
+
+    ctx.strokeStyle =
+        "#7b879d";
+
+    ctx.beginPath();
+
+    ctx.moveTo(0,lastY);
+
+    ctx.lineTo(width,lastY);
+
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+
+
+    ctx.fillStyle =
+        "#e8edf7";
+
+    ctx.font =
+        "12px Arial";
+
+    ctx.fillText(
+        rupiah(price),
+        width-90,
+        lastY-6
+    );
+
 }
 
-function cashOut() {
 
-    if (!running) return;
+/* =========================
+   BUY
+========================= */
 
-    let win = Math.floor(bet * multiplier);
+function buyDL(){
 
-    balance += win;
-    updateBalance();
+    let amount =
+        Number(
+            document.getElementById(
+                "amount"
+            ).value
+        );
 
-    addHistory(multiplier, true);
 
-    clearInterval(gameTimer);
+    if(amount <= 0)
+        return;
 
-    running = false;
 
-    statusEl.textContent =
-        "💰 CASH OUT +" + win + " WL";
+    let cost =
+        amount*price;
 
-    multiplierEl.classList.add("green");
 
-    betButton.style.display = "block";
-    cashoutButton.style.display = "none";
+    if(idrBalance < cost){
 
-    setTimeout(() => {
-        multiplierEl.classList.remove("green");
-        resetRocket();
-    }, 1200);
-}
+        alert(
+            "Saldo IDR tidak cukup!"
+        );
 
-function crash() {
+        return;
 
-    clearInterval(gameTimer);
-
-    running = false;
-
-    multiplierEl.textContent =
-        crashPoint.toFixed(2) + "x";
-
-    multiplierEl.classList.remove("green");
-    multiplierEl.classList.add("red");
-
-    statusEl.textContent = "💥 CRASHED!";
-
-    rocketEl.classList.add("crash");
-
-    addHistory(crashPoint, false);
-
-    betButton.style.display = "block";
-    cashoutButton.style.display = "none";
-
-    setTimeout(() => {
-
-        multiplierEl.classList.remove("red");
-
-        resetRocket();
-
-    }, 1300);
-}
-
-function resetRocket() {
-
-    rocketEl.classList.remove("crash");
-
-    rocketEl.style.bottom = "35px";
-    rocketEl.style.left = "50%";
-
-    multiplier = 1;
-
-    multiplierEl.textContent = "1.00x";
-
-    statusEl.textContent = "Place your bet!";
-}
-
-function addHistory(value, won) {
-
-    const item = document.createElement("div");
-
-    item.className =
-        "history-item " + (won ? "green" : "red");
-
-    item.textContent =
-        value.toFixed(2) + "x";
-
-    historyList.prepend(item);
-
-    while (historyList.children.length > 8) {
-        historyList.removeChild(historyList.lastChild);
     }
+
+
+    idrBalance -= cost;
+
+    dlBalance += amount;
+
+    volume += amount;
+
+
+    addTrade(
+        "BUY",
+        amount,
+        price
+    );
+
+
+    updateUI();
+
 }
 
-updateBalance();
+
+/* =========================
+   SELL
+========================= */
+
+function sellDL(){
+
+    let amount =
+        Number(
+            document.getElementById(
+                "amount"
+            ).value
+        );
+
+
+    if(amount <= 0)
+        return;
+
+
+    if(dlBalance < amount){
+
+        alert(
+            "Diamond Lock tidak cukup!"
+        );
+
+        return;
+
+    }
+
+
+    let value =
+        amount*price;
+
+
+    dlBalance -= amount;
+
+    idrBalance += value;
+
+    volume += amount;
+
+
+    addTrade(
+        "SELL",
+        amount,
+        price
+    );
+
+
+    updateUI();
+
+}
+
+
+/* =========================
+   HISTORY
+========================= */
+
+function addTrade(
+    type,
+    amount,
+    tradePrice
+){
+
+    let div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.className = "trade";
+
+
+    div.innerHTML = `
+
+        <span class="${
+            type==="BUY"
+            ? "green"
+            : "red"
+        }">
+            ${type}
+        </span>
+
+        <span>
+            ${amount} DL
+        </span>
+
+        <span>
+            ${rupiah(tradePrice)}
+        </span>
+
+    `;
+
+
+    document
+        .getElementById("trades")
+        .prepend(div);
+
+
+    if(
+        document
+        .getElementById("trades")
+        .children.length > 8
+    ){
+
+        document
+        .getElementById("trades")
+        .lastChild
+        .remove();
+
+    }
+
+}
+
+
+/* =========================
+   TIMEFRAME
+========================= */
+
+function setTimeframe(
+    value,
+    button
+){
+
+    timeframe = value;
+
+
+    document
+        .querySelectorAll(
+            ".tabs button"
+        )
+        .forEach(
+            b=>b.classList.remove(
+                "active"
+            )
+        );
+
+
+    button.classList.add(
+        "active"
+    );
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+newCandle();
+
+
+for(let i=0;i<45;i++){
+
+    price +=
+        (Math.random()-0.48)
+        *price*0.003;
+
+    newCandle();
+
+}
+
+
+price = 50000;
+
+updateUI();
+
+resizeCanvas();
+
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+
+/*
+   Update setiap 1 detik
+*/
+
+setInterval(
+    updateMarket,
+    1000
+);
+
+
+/*
+   Candle baru setiap 10 detik
+   untuk simulasi timeframe.
+*/
+
+setInterval(
+    newCandle,
+    10000
+);
 
 </script>
 
 </body>
- </html>
+</html>
